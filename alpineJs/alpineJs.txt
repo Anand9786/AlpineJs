@@ -1,0 +1,541 @@
+Alpine JS
+
+
+Directives:
+
+1. x-data
+- Declares a new component scope or object in any html element.
+- Note: The x-data value cannot be accessed from elements outside the element it was declared.
+<div x-data="{ open: false }"></div>
+
+2. x-text
+- Set the inner-text content of an element
+ex1. <div x-data="{ username: alpine }">
+        Username: <strong x-text=’username’></strong>
+     </div> 
+ex2. <span x-text="new Date().getFullYear()"></span>
+ex3. <div x-data="{ open: false }" x-text="open"></div>
+
+3. x-bind
+- Allows you to set HTML attributes on elements based on the result of JavaScript expressions or javascript object.
+- It is most often useful for setting specific classes on an element based on your Alpine state.
+ex1. <input x-data="{ inputType: 'password' }" x-bind:type="inputType">
+ex2. <input x-data="{ inputType: 'password' }" :type="inputType">
+ex3. <div x-data="{ open: false }">
+        <button x-on:click="open = ! open">Toggle Dropdown</button>
+        <div :class="open ? '' : 'hidden'">  OR <div :class="open || 'hidden'">
+            Dropdown Contents...
+        </div>
+    </div>
+
+4. x-model
+- The Value of element(s) and the value of an object (data) influence each other. This is 2-Way-Binding!
+- x-model is smart enough to detect changes on text inputs, checkboxes, radio buttons, textareas, selects, and multiple selects.
+ex1.  <section x-data="{ myInput: 'Hello' }">
+          <input x-model="myInput" :value="myInput" class="border border-1 p-1 rounded shadow" type="text">
+          <input x-model="myInput" :value="myInput" class="border border-1 p-1 rounded shadow" type="text">
+      </section>
+ex2.  <section x-data="{
+          myColor: 'gray',
+          selectClasses: ' h-full p-2 rounded ml-3 border border-gray-900 text-white focus:outline-none'
+      }" class="flex">
+          <div :class="'bg-'+ myColor + '-600'" style="height: 5rem; width: 5rem; border: 1px solid #555;"></div>
+          <select x-model="myColor" :class="'bg-' + myColor + '-600' + selectClasses">
+              <option value="gray">Select color</option>
+              <option>green</option>
+              <option>blue</option>
+              <option>red</option>
+          </select>
+      </section>
+
+5. x-show 
+Toggles display: none; on the element depending on expression (true or false).
+ex. <section x-data="{ 
+        showText: false,
+        buttonClass: 'transition p-1 rounded shadow focus:outline-none '
+    }">
+        <button @click="showText = !showText" x-text="showText ? 'Hide' : 'Show'" :class="showText ? buttonClass + 'bg-red-300 hover:bg-red-400' : buttonClass + 'bg-green-300 hover:bg-green-400'">Show</button>
+        <span x-show="showText" class="bg-gray-200 ml-3 p-2">I am supposed to be seen only when <b>show == true</b>.</span>
+    </section>
+
+6. x-if
+- Used for toggling elements on the page, similarly to x-show, however it completely adds and removes the element it's applied to rather than just changing its CSS display property to "none".
+- It can help you manage conditional rendering in your application, allowing you to add or remove elements dynamically based on certain conditions.
+- Note: x-if will work only on template tag. and in template tag rendered only one element
+- Note: x-if removes the element from the DOM when the condition is false, whareas x-show toggles the visibility of the element by applying display: none CSS style when the condition is false.
+ex.  <section x-data="{ 
+        showText: false,
+        buttonClass: 'transition p-1 rounded shadow focus:outline-none '
+    }">
+        <button @click="showText = !showText" x-text="showText ? 'Hide' : 'Show'" :class="showText ? buttonClass + 'bg-red-300 hover:bg-red-400' : buttonClass + 'bg-green-300 hover:bg-green-400'">Show</button>
+        <template x-if="showText">
+            <span class="bg-gray-200 ml-3 p-2">I am supposed to be seen only when <b>show == true</b>.</span>
+        </template>
+    </section>
+
+7. x-on
+- Attaches an event listener to the element it's declared on.
+- Note: You can use the shorter "@" syntax: @click="...".
+ex1. <button x-on:click="foo = 'bar'"></button>
+ex2. <button x-on:click="myFunction"></button> equivalent to
+ex3. <button x-on:click="myFunction($event)"></button>
+ex4. <button @click="alert('Hello World!')">Say Hi</button>
+
+8. x-ref
+- Reference elements directly by their specified keys using the $refs magic property.
+- It lets you easily access raw DOM elements inside your component. By adding an x-ref attribute to an element, you can reference it within your event handlers using an object called $refs. This is easier than setting id attributes and using document.querySelector everywhere.
+- It's most useful as a replacement for APIs like getElementById and querySelector.
+ex1. <div x-ref="foo"></div><button x-on:click="$refs.foo.innerText = 'bar'"></button>
+ex2. <div x-data="{ inputText: '', updateText() { this.inputText = $refs.myInput.value; } }">
+        <input type="text" x-ref="myInput" placeholder="Type something" />
+        <button class="btn btn-primary" @click="updateText()">Update Text</button>
+        <p>Entered Text: <strong x-text="inputText"></strong></p>
+     </div>
+ex3. <section x-data="{
+        remainingChars : 10
+     }">
+         <input 
+             @keyup="remainingChars = 10 - $refs.username.value.length"
+             x-ref="username" 
+             placeholder="Enter Username (max. 10 Char)" 
+             class="border border-1 p-1 w-60 rounded shadow" maxlength="10" type="text"
+         >
+         <br>
+         <span x-text="remainingChars + ' characters remaining'"></span>
+     </section>
+
+9. function
+- To call any function with an alpine event listener (@click etc.) you need an x-data either in the same or at a parent element. This x-data can be even completely empty.
+- A "function" inside a component = object is a "method" which does not have the keyword "function".
+ex. <script>
+        function myComponent(startName = '') {
+            return {
+                myName: startName,
+                hello() {
+                    alert('Hello ' + this.myName);
+                },
+                hello_name(hello_param) {
+                    alert('Hello ' + hello_param);
+                },
+                sayMyName() {
+                    if(this.myName) {
+                        alert('Are You ' + this.myName + ' ?');
+                        this.myName = "";
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Example 2: @click -->
+    <h3><b>Example 2:</b> Call a function on @click</h3>
+    <section x-data="myComponent('Anand')">
+        <button @click="hello()" class="bg-gray-200 p-1 rounded hover:bg-gray-300 border border-1 border-gray-500">
+            Say Hello!
+        </button>
+    </section>
+
+
+    <!-- Call a method woth parameters -->
+    <h3><b>Example 2.1:</b> Call a method on @click</h3>
+    <section x-data="myComponent()">
+        <button @click="hello_name('Anand')" class="bg-gray-200 p-1 rounded hover:bg-gray-300 border border-1 border-gray-500">
+            Say Hello! ( with param )
+        </button>
+    </section>
+
+    <!-- Example 3: @click show name from Input -->
+    <h3><b>Example 3:</b> Reuse Component and use "this." for object values</h3>
+    <section x-data="myComponent">
+        <button @click="sayMyName" class="bg-gray-200 p-1 rounded hover:bg-gray-300 border border-1 border-gray-500">
+            SAY MY NAME !!!
+        </button>
+        <form @submit.prevent="sayMyName" class="inline">
+            <input x-model="myName" type="text" placeholder="Enter Name" class="ml-2"> 
+        </form>
+    </section>
+    
+10. x-transition
+- It provides a smooth and easy way to add transition effects to elements when they are shown or hidden. It allows you to define the transition properties for when an element enters or leaves the DOM.
+- You can specify different styles and animations for each phase of the transition: enter, leave, enter-start, enter-end, leave-start, and leave-end.
+Ex. <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-90"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-90"
+    >This element will toggle with transition.</div>
+
+11. x-cloak
+- It is used to prevent an element from being visible while the Alpine.js JavaScript is being initialized and processed. This helps avoid showing unstyled or uninitialized content to the user.
+- When you add the x-cloak attribute to an element, Alpine.js automatically removes the attribute once it finishes initializing and processing. This causes the element to appear only after Alpine.js has completed its setup.
+ex. <div x-data="{}" x-cloak></div>
+
+12. x-for
+- It allows you to loop through an array and generate multiple instances of an element based on the items in that array. It's similar to a for loop in other programming languages, but for creating HTML elements.
+- It can help you manage conditional rendering in your application, allowing you to add or remove elements dynamically based on certain conditions.
+- Note: x-for MUST be declared on a <template> element That <template> element MUST contain only one root element
+ex1. <ul x-data="{ emp: { name: 'Anand', id: '3288', department: 'Open-source' } }">
+        <template x-for="(value, key) in emp" :key="key">
+            <li>
+                <span x-text="key"></span>:<span x-text="value"></span>
+            </li>
+        </template>
+    </ul>
+ex2.<script>
+        let personsOutsourced = [
+            {
+                name: 'Anand',
+                age: 25
+            },
+            {
+                name: 'Foram',
+                age: 24
+            }
+        ]
+    </script>
+    <section x-data="{persons : personsOutsourced}">
+        <template x-for="person in persons">
+            <div>
+                Name: <span x-text="person.name"></span>, Age: <span x-text="person.age"></span>
+            </div>
+        </template>
+    </section>
+
+13. x-init: 
+- Runs an expression when a component is initialized.
+- x-init="() => { // access to the post-dom-initialization state // }"
+ex. <script>
+    	function setOpen() {
+            this.open = false;
+        }
+    </script>
+
+    <div x-data="{ open: true }" x-init="setOpen()">
+      	<div>Open?: <span x-text="open"></span></div>
+    </div>
+automatically run the setOpen function when component initialized
+- If you have both an x-data object containing an init() method and an x-init directive, the x-data method will be called before the directive.
+ex. <div
+        x-init="console.log('I am called second')"
+        x-data="{
+            init() {
+                console.log('I am called first')
+            }
+        }"
+    >
+    ...
+    </div>
+o/p. I am called first
+     I am called second
+
+14. x-html
+- Set the inner-html property of an element
+ex. <div x-data="{ username: '<strong>calebporzio</strong>' }">
+        Username: <span x-html="username"></span>
+    </div>
+
+15. x-modelable
+- Allows you to expose any Alpine property as the target of the x-model directive.
+- outer scope property "number" is now bound to the inner scope property "count"
+- x-modelable property name condition apply on x-model property name
+ex. expose a variable for binding with x-model
+<div x-data="{ number: 5 }">
+    <div x-data="{ count: 0 }" x-modelable="count" x-model="number">
+        <button @click="count++">Increment</button>
+    </div>
+ 
+    Number: <span x-text="number"></span>
+</div>
+
+16. @event
+- Used to attach event listeners to HTML elements. It allows you to specify an event type (like click, input, change, etc.) and execute a JavaScript expression or function when the event occurs.
+ex: 
+<div x-data="{ count: 0 }">
+    <!-- Button that listens for a click event -->
+    <button @click="count++">Increment</button>
+    <!-- Displays the value of count -->
+    <p>Count: <span x-text="count"></span></p>
+</div>
+This way, the @event directive helps you handle user interactions in a clear and concise manner.
+
+17. x-effect
+- It allows you to create reactive side effects that run whenever the data in your component changes. This directive lets you define code that will be executed automatically whenever the component's state is updated. This is useful for creating dynamic or conditional logic based on your data.
+ex1.<div x-data="{ count: 0, color: 'red' }">
+        <!-- Button to increment the count -->
+        <button @click="count++">Increment Count</button>
+        <!-- Reactive side effect: Changes the color based on count value -->
+        <div x-effect="color = count % 2 === 0 ? 'red' : 'blue'">
+            <!-- Display the current count with the dynamically set color -->
+            <p :style="{ color }" x-text="'Count: ' + count"></p>
+        </div>
+    </div>
+ex2.<div x-data="{ label: 'Hello' }" x-effect="console.log(label)">
+        <button @click="label += ' World!'">Change Message</button>
+    </div>
+
+18. x-ignore
+- It allows you to tell Alpine to ignore a specific element and its children. This means that Alpine will not process any Alpine directives (such as x-data, x-show, etc.) within the element or its children.
+ex1.<div x-data="{ label: 'From Alpine' }">
+        <div x-ignore>
+            <span x-text="label"></span>
+        </div>
+    </div>
+ex2.<div x-data="{ show: true }">
+        <button @click="show = !show">Toggle visibility</button>
+        <!-- This div and its children will be ignored by Alpine.js -->
+        <div x-ignore>
+            <p>This is ignored by Alpine.js.</p>
+            <div x-show="show">This text will not change even when the button is clicked because Alpine.js ignores it.</div>
+        </div>
+
+        <!-- This div and its children will be processed by Alpine.js -->
+        <div>
+            <p>This is managed by Alpine.js.</p>
+            <div x-show="show">This text will appear or disappear when the button is clicked.</div>
+        </div>
+    </div>
+
+19. x-teleport
+- It allows you to move an element's contents to another location in the DOM while keeping its Alpine data and behaviors intact. This can be useful for reorganizing your HTML structure or moving elements for better layout and styling without changing your JavaScript logic.
+- By attaching x-teleport to a <template> element, you are telling Alpine to "append" that element to the provided selector.
+ex1. <div x-data="{ open: false }">
+        <button @click="open = ! open">Toggle Modal</button>
+    
+        <template x-teleport=".class" @click="open = false">
+            <div x-show="open">
+                Modal contents...
+                (click to close)
+            </div>
+        </template>
+    </div>
+    <div class="class"></div>
+
+20. x-defer
+- Used for hold initialization of Alpine components and initialize after enters the viewport, user interacts and also add the x-ignore directive before initialization of Alpine components.
+Possible values are:
+- intersect -> x-defer="intersect" - It will hold off initializing a component until it enters the viewport.
+- interact -> x-defer="interact" - It initialize a component as soon as a user interacts with the page, that is, one of the touchstart, mouseover, wheel, scroll, or keydown events is dispatched.
+- idle -> x-defer="idle" - The component will be initialized at the convenience of the browser
+ex. <div x-data="{ shown: false }" id="test" x-intersect:enter="shown = false" x-defer="intersect">
+        <div x-show="shown">
+            I'm in the viewport!
+        </div>
+        <div x-show="shown" x-transition:enter.duration.2000ms>
+            <span x-text="`This component is initialized when it enters the viewport.`"></span>
+        </div>
+    </div>
+
+
+Magic Properties:
+
+1. $el
+- Used to Retrieve the current DOM node
+ex1. <button @click="$el.innerHTML = 'Hello World!'">Replace me with "Hello World!"</button>
+ex2.<div x-data="{ changeColor() { this.$el.style.backgroundColor = 'yellow'; } }">
+        <button @click="changeColor()">Change Background Color</button>
+    </div>
+
+2. $refs
+- Holds the DOM reference of elements that has the x-ref directive on them
+ex. <div x-data>
+        <button @click="$refs.text.remove()">Remove Text</button>
+        <span x-ref="text">Hello 👋</span>
+
+        <div x-ref="title">Title</div>
+        <button @click="alert($refs.title.innerHTML)">click me</button>
+    </div>
+
+3. $stores or Alpine.store
+- Provides access to global state management using Alpine stores
+- $store is a feature that allows you to create a central place to hold and manage data that can be shared across different parts of your web application
+ex1.<button x-data @click="$store.darkMode.toggle()">Toggle Dark Mode</button>
+    <div x-data :class="$store.darkMode.on && 'bg-black'">
+        ...
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('darkMode', {
+                on: false,
+    
+                toggle() {
+                    this.on = ! this.on
+                }
+            })
+        })
+    </script>
+ex2.<button x-data @click="$store.darkMode = ! $store.darkMode">Toggle Dark Mode</button>
+    <div x-data :class="$store.darkMode && 'bg-black'">
+        ...
+    </div>
+    
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('darkMode', false)
+        })
+    </script>
+
+4. $watch      
+- Watches for changes to a variable and executes a function when the variable changes
+ex. <div x-data="{ open: false }" x-init="$watch('open', (value, oldValue) => console.log(value, oldValue))">
+        <button @click="open = ! open">Toggle Open</button>
+    </div>
+
+5. $dispatch
+- $dispatch is a method that lets you fire (trigger) a custom event on an element.
+- You can pass data along with the event, making it useful for sending information between different parts of your application. It is called like this: $dispatch('custom-event', detail)
+- The first param is the name of the custom event to fire, and the second param is the detail that will be passed to the handler function of the custom event
+ex1.<!-- Work as a parent level -->
+    <div x-data @notify="alert('Hello BB!')">
+        <button @click="$dispatch('notify')">
+            Notify
+        </button>
+    </div>
+    <div x-data @notify="alert($event.detail.message)">
+        <button @click="$dispatch('notify', { message: 'Hello Anand!' })">
+            Notify
+        </button>
+    </div>
+ex2.<!-- if you work as a sibling level use .window but if you use .window it will be work as window level and also be used in out of the scope-->
+    <div x-data>
+        <div @notify.window="alert('Hello ss!')"></div>
+        <button @click="$dispatch('notify')">
+            Notify
+        </button>
+    </div>
+ex3.<div
+        x-data="{ title: 'Hello' }"
+        @set-title.window="title = $event.detail"
+    >
+        <h1 x-text="title"></h1>
+    </div>
+    <div x-data>
+        <button @click="$dispatch('set-title', 'Hello World!')">Click me</button>
+    </div>
+    <!-- When clicked, the content of the h1 will set to "Hello World!". -->
+ex4.<div x-data="{ title: 'Hello' }">
+        <span x-model="title">
+            <button @click="$dispatch('input', 'Hello World!')">Click me</button>
+            <!-- After the button is pressed, `x-model` will catch the bubbling "input" event, and update title. -->
+        </span>
+    </div>
+
+6. $nextTick
+- It allows the user to run a function after the DOM has been updated. This is useful when users need to perform actions that depend on the latest state of the DOM, such as focusing an element or scrolling to a certain position.
+- It ensures that your code runs after the DOM changes caused by state updates have been applied.
+ex.<div x-data="{ title: 'Hello' }">
+        <button
+            @click="
+                title = 'Hello World!';
+                $nextTick(() => { console.log($el.innerText) });
+            "
+            x-text="title"
+        ></button>
+    </div>
+
+7. $root
+- used to retrieve the root element of any Alpine component. In other words the closest element up the DOM tree that contains x-data
+ex. <div x-data data-message="Hello World!">
+        <button @click="alert($root.dataset.message)">Say Hi</button>
+    </div>
+
+8. $data
+- Gives you access to the current Alpine data scope (generally provided by x-data)
+- Most of the time, you can just access Alpine data within expressions directly. for example x-data="{ message: 'Hello Caleb!' }" will allow you to do things like x-text="message"
+ex1.<div x-data="{ count: 0, message: 'Hello' }">
+        <p>Count: <span x-text="$data.count"></span></p>
+        <p>Message: <span x-text="$data.message"></span></p>
+        <!-- Increment count and change message -->
+        <button @click="$data.count++; $data.message = 'World'">Click me</button>
+    </div>
+ex2.<div x-data="{ greeting: 'Hello' }">
+        <div x-data="{ name: 'Anand' }">
+            <button @Click="sayHello($data)">Say Hello</button>
+        </div>
+    </div>
+    <script>
+        function sayHello({ greeting, name }) {
+            alert(greeting + ' ' + name );
+        }
+    </script>
+
+9. $id
+- Used to generate an element's ID and ensure that it won't conflict with other IDs of the same name on the same page.
+ex1.<div x-data>
+        <input type="text" :id="$id('text-input')">
+        <!-- id="text-input-1" -->
+        
+        <input type="text" :id="$id('text-input')">
+        <!-- id="text-input-2" -->
+    </div>
+ex2. if you need use same id for label and input
+    <div x-data x-id="['text-input']">
+        <label :for="$id('text-input')"> <!-- "text-input-1" -->
+        <input type="text" :id="$id('text-input')"> <!-- "text-input-1" -->
+    
+        <div x-id="['text-input']">
+            <label :for="$id('text-input')"> <!-- "text-input-2" -->
+            <input type="text" :id="$id('text-input')"> <!-- "text-input-2" -->
+        </div>
+    </div>
+ex3.<div x-data="{ id: $id('text-input') }">
+        <label :for="id"> <!-- "text-input-1" -->
+        <input type="text" :id="id"> <!-- "text-input-1" -->
+    </div>
+ 
+    <div x-data="{ id: $id('text-input') }">
+        <label :for="id"> <!-- "text-input-2" -->
+        <input type="text" :id="id"> <!-- "text-input-2" -->
+    </div>
+ex4.<div x-data="{ name: 'John' }" x-id="['nameInput']">
+        <input :id="$id('nameInput')" x-model="name" />
+        <p>Name: <span x-text="name"></span></p>
+    </div>
+
+
+Globals
+
+1. Alpine.data
+- Alpine.data(...) provides a way to re-use x-data contexts within your application.
+ex. <div x-data="dropdown">
+        <button @click="toggle">...</button>
+    
+        <div x-show="open">...</div>
+    </div>
+    
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dropdown', () => ({
+                open: false,
+    
+                toggle() {
+                    this.open = ! this.open
+                }
+            }))
+        })
+    </script>
+
+2. Alpine.bind
+- Alpine.bind(...) provides a way to re-use x-bind objects within your application.
+- Binding attributes manually
+    <button type="button" @click="doSomething()" :disabled="shouldDisable"></button>
+- using Alpine.bind
+    <button x-bind="SomeButton"></button>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.bind('SomeButton', () => ({
+                type: 'button',
+    
+                '@click'() {
+                    this.doSomething()
+                },
+    
+                ':disabled'() {
+                    return this.shouldDisable
+                },
+            }))
+        })
+    </script>
