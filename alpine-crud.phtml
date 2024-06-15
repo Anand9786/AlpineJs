@@ -1,0 +1,317 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+?>
+
+<div class="mx-auto">
+  <div x-data="formData()" class="p-10 bg-white rounded-lg shadow-md">
+    <h2 class="font-medium mb-4 text-2xl w-full text-center">Alpine CRUD</h2>
+    <form @submit.prevent="addOrUpdateEntry">
+      <p x-show="formSuccess" class="message success mb-4 block">
+        <span x-text="submitMsg"></span>
+      </p>
+
+      <p x-show="deleteSuccess" class="message success mb-4">
+        Data deleted successfully!!!
+      </p>
+
+      <div class="mb-4">
+        <label for="name" class="block text-gray-700 mb-1">Name:</label>
+        <input
+          type="text"
+          id="name"
+          x-model="form.name"
+          class="form-control w-full border rounded-md p-2 focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          placeholder="Enter Name"
+        />
+        <p
+          x-show="errors.name"
+          class="message error my-2"
+          x-text="errors.name"
+        ></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="department" class="block text-gray-700 mb-1"
+          >Department:</label
+        >
+        <select
+          id="department"
+          x-model="form.department"
+          class="form-select w-full border rounded-md mb-2 p-2 focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+        >
+          <option value="">-- Select an option --</option>
+          <option value="Magento">Magento</option>
+          <option value="Odoo">Odoo</option>
+          <option value="Node">Node</option>
+        </select>
+        <p
+          x-show="errors.department"
+          class="message error mb-4"
+          x-text="errors.department"
+        ></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="date" class="block text-gray-700 mb-1">Joining Date:</label>
+        <input
+          type="date"
+          id="date"
+          x-model="form.date"
+          class="form-control w-full border rounded-md p-2 focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          placeholder="dd-mm-yyyy"
+        />
+        <p
+          x-show="errors.date"
+          class="message error my-2"
+          x-text="errors.date"
+        ></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="mobile" class="block text-gray-700 mb-1">Mobile:</label>
+        <input
+          type="number"
+          maxlength="10"
+          id="mobile"
+          x-model="form.mobile"
+          class="form-control w-full border rounded-md p-2 focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          placeholder="Enter Mobile"
+        />
+        <p
+          x-show="errors.mobile"
+          class="message error my-2"
+          x-text="errors.mobile"
+        ></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="gender" class="block text-gray-700 mb-1">Gender:</label>
+        <label class="inline-flex items-center">
+          <input
+            type="radio"
+            name="gender"
+            value="Male"
+            x-model="form.gender"
+            class="form-radio h-4 w-4 border rounded mb-2 text-indigo-600 focus:ring focus:ring-indigo-200"
+          />
+          <span class="ml-2">Male</span>
+        </label>
+        <label class="inline-flex items-center ml-4">
+          <input
+            type="radio"
+            name="gender"
+            value="Female"
+            x-model="form.gender"
+            class="form-radio h-4 w-4 border rounded mb-2 text-indigo-600 focus:ring focus:ring-indigo-200"
+          />
+          <span class="ml-2">Female</span>
+        </label>
+        <p
+          x-show="errors.gender"
+          class="message error my-2"
+          x-text="errors.gender"
+        ></p>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-start items-center">
+        <button
+          type="submit"
+          class="btn mr-2"
+          x-text="form.id ? 'Update Data' : 'Add Data'"
+        ></button>
+        <button type="reset" @click="resetForm" class="btn">Reset</button>
+      </div>
+    </form>
+
+    <!-- Form Data List -->
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold mb-2">Form Data:</h2>
+      <ul>
+        <li
+          class="flex justify-between items-center p-4 px-2 border border-b-0 bg-gray-100 font-bold"
+        >
+          <div class="w-1/4">Name</div>
+          <div class="w-1/4">Department</div>
+          <div class="w-1/4">Date</div>
+          <div class="w-1/4">Mobile</div>
+          <div class="w-1/4">Gender</div>
+          <div class="w-1/4">Action</div>
+        </li>
+        <template x-for="entry in formData" :key="entry.id">
+          <li
+            class="flex justify-between items-center p-2 border border-b-0 bg-gray-100"
+          >
+            <div class="w-1/4" x-text="entry.name"></div>
+            <div class="w-1/4" x-text="entry.department"></div>
+            <div class="w-1/4" x-text="formatDate(entry.date)"></div>
+            <div class="w-1/4" x-text="entry.mobile"></div>
+            <div class="w-1/4" x-text="entry.gender"></div>
+            <div class="space-x-2 flex gap-2 w-1/4">
+              <button
+                @click="editEntry(entry.id)"
+                class="btn btn-primary bg-green-600 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                @click="deleteEntry(entry.id)"
+                class="btn btn-primary bg-red-600 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function formData() {
+    return {
+      form: {
+        id: null,
+        name: "",
+        department: "",
+        date: "",
+        mobile: "",
+        gender: "",
+      },
+      formData: [],
+      formSuccess: false,
+      deleteSuccess: false,
+      submitMsg: "",
+      errors: {},
+
+      // Fetch data from local storage on initialization
+      init() {
+        this.loadDataFromLocalStorage();
+      },
+
+      // Load data from local storage
+      loadDataFromLocalStorage() {
+        const storedData = localStorage.getItem("formData");
+        if (storedData) {
+          this.formData = JSON.parse(storedData);
+        }
+      },
+
+      // Save data to local storage
+      saveDataToLocalStorage() {
+        localStorage.setItem("formData", JSON.stringify(this.formData));
+      },
+
+      // Validate form fields
+      validateForm() {
+        this.errors = {};
+
+        if (!this.form.name) {
+          this.errors.name = "Name is required.";
+        }
+
+        if (!this.form.department) {
+          this.errors.department = "Department is required.";
+        }
+
+        if (!this.form.date) {
+          this.errors.date = "Date is required.";
+        }
+
+        if (!this.form.mobile) {
+          this.errors.mobile = "Mobile number is required.";
+        }
+
+        if (!this.form.gender) {
+          this.errors.gender = "Gender is required.";
+        }
+
+        return Object.keys(this.errors).length === 0;
+      },
+
+      // Add a new entry or update an existing entry
+      addOrUpdateEntry() {
+        if (!this.validateForm()) {
+          return;
+        }
+
+        this.formSuccess = true;
+
+        setTimeout(() => {
+          this.formSuccess = false;
+        }, 2000);
+
+        if (this.form.id === null) {
+          // Add a new entry
+          const newEntry = { ...this.form, id: Date.now() };
+          console.log(Date.now());
+          this.formData.push(newEntry);
+          this.submitMsg = "Data Added Successfully!!!";
+        } else {
+          // Update an existing entry
+          const index = this.formData.findIndex(
+            (entry) => entry.id === this.form.id
+          );
+          if (index !== -1) {
+            this.formData[index] = { ...this.form };
+            this.submitMsg = "Data Updated Successfully!!!";
+          }
+        }
+
+        // Save the updated formData list to local storage
+        this.saveDataToLocalStorage();
+
+        // Reset the form
+        this.resetForm();
+      },
+
+      // Edit an existing entry
+      editEntry(id) {
+        const entry = this.formData.find((entry) => entry.id === id);
+        if (entry) {
+          this.form = { ...entry };
+        }
+      },
+
+      // Delete an entry
+      deleteEntry(id) {
+        this.deleteSuccess = true;
+
+        setTimeout(() => {
+          this.deleteSuccess = false;
+        }, 2000);
+
+        this.formData = this.formData.filter((entry) => entry.id !== id);
+        // Save the updated formData list to local storage
+        this.saveDataToLocalStorage();
+      },
+
+      // Reset the form to its initial state
+      resetForm() {
+        this.form = {
+          id: null,
+          name: "",
+          department: "",
+          date: "",
+          mobile: "",
+          gender: "",
+        };
+      },
+
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        const options = { month: "short", day: "numeric", year: "numeric" };
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+      },
+    };
+  }
+</script>

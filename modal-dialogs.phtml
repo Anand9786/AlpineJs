@@ -1,0 +1,183 @@
+<?php
+
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+/** @var \Hyva\Theme\ViewModel\Modal $modalViewModel */
+/** @var HeroiconsOutline $heroicons */
+
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+$modalViewModel = $viewModels->require(\Hyva\Theme\ViewModel\Modal::class);
+
+?>
+<!-- Modal Dialog using viewModal -->
+<div x-data="hyva.modal()" class="relative container p-4 bg-white rounded-lg shadow-md my-8">
+    <p class="text-3xl font-bold mb-2">Modal Dialog using viewModal( Doc )</p>
+    <button @click="show" type="button" class="btn mt-10" aria-haspopup="dialog">
+        <?= $escaper->escapeHtml(__('Show')) ?>
+    </button>
+    <?= $modalViewModel->createModal()->withContent(<<<END_OF_CONTENT
+
+    <div id="the-label">{$escaper->escapeHtml(__('My Dialog'))}</div>
+    <div class="mt-20 flex justify-between gap-2">
+        <button @click="hide" type="button" class="btn">
+            {$escaper->escapeHtml(__('Cancel'))}
+        </button>
+        <button x-focus-first @click="alert('beep')" type="button" class="btn btn-primary">
+            {$escaper->escapeHtml(__('I agree'))}
+        </button>
+    </div>
+
+    END_OF_CONTENT
+    )->positionBottom()
+    ->withAriaLabelledby('the-modal')
+    ->addDialogClass('border', 'border-10', 'border-blue-800')
+    ?>
+</div>
+
+<!-- Modal Dialog using viewModal -->
+<div x-data="hyva.modal()" class="relative container p-4 bg-white rounded-lg shadow-md my-8">
+    <p class="text-3xl font-bold mb-2">Modal Dialog using viewModal</p>
+    <button @click="show('modal1', $event)" type="button" class="btn mt-10" aria-haspopup="dialog">
+        <?= $escaper->escapeHtml(__('Show')) ?>
+    </button>
+    
+    <?= $modalViewModel->createModal()
+        ->withContent('<div class="shadow-xl rounded-md p-6 w-1/2 bg-white"><div class="flex justify-between border-b-2 border-gray-500">'
+        . '<div id="the-label">' . $escaper->escapeHtml(__('My Dialog Title')) . '</div>'
+        . '<button @click="hide" type="button">'
+        . $heroicons->xHtml('', 18, 18, ['aria-hidden' => 'true'])
+        . '</button></div>'
+        . '<div class="mt-3">' . $escaper->escapeHtml(__('My Dialog Content')) . '</div>'
+        . '<div class="mt-6 flex justify-between gap-2">'
+        . '<button @click="hide" type="button" class="btn">'
+        . $escaper->escapeHtml(__('Cancel'))
+        . '</button>'
+        . '<button x-focus-first @click="alert(\'beep\')" type="button" class="btn btn-primary">'
+        . $escaper->escapeHtml(__('I agree'))
+        . '</button></div></div>')
+        ->positionBottom()
+        ->withAriaLabelledby('the-label')
+        ->withDialogRefName("modal1")
+        ->addDialogClass('border', 'border-10', 'border-blue-800', 'fixed', 'inset-0', 'z-40', 'w-screenh-screen', 'bg-gray-900', 'bg-opacity-50', 'flex', 'items-center', 'justify-center')
+    ?>
+</div>
+
+<!-- Modal Dialog with template file -->
+<?php
+    $modal = $modalViewModel->createModal()->withTemplate('Magento_Contact::form/contact-details.phtml');
+?>
+
+<section class="mt-20">
+    <div class="container p-4 bg-white rounded-lg shadow-md my-8">
+        <p class="text-3xl font-bold mb-2">Modal Dialog with template file</p>
+        <div x-data="hyva.modal()">
+            <button @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>" type="button" class="btn mt-10" aria-haspopup="dialog">
+                <?= $escaper->escapeHtml(__('Show Template Modal')) ?>
+            </button>
+            <?= $modal->withAriaLabel('Modal with template demo') ?>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Dialog with Block Name -->
+<?php
+    $blockModal = $modalViewModel->createModal()->withBlockName('default_no_route');
+?>
+
+<section>
+    <div class="container p-4 bg-white rounded-lg shadow-md my-8">
+        <p class="text-3xl font-bold mb-2">Modal Dialog with Block Name</p>
+        <div x-data="hyva.modal()">
+            <button @click="<?= $escaper->escapeHtmlAttr($blockModal->getShowJs()) ?>" type="button" class="btn mt-10" aria-haspopup="dialog">
+                <?= $escaper->escapeHtml(__('Show Block Modal')) ?>
+            </button>
+            <?= $blockModal->withAriaLabel('Example modal with content from predeclared block') ?>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Dialog with Content -->
+<?php
+    $content = '
+        <div id="the-label">' . $escaper->escapeHtml(__('Modal Dialog with Content')) . '</div>
+        <div class="mt-20 flex justify-between gap-2">
+            <button type="button" class="btn" @click="hide">
+                ' . $escaper->escapeHtml(__('Cancel')) . '
+            </button>
+            <button type="button" class="btn btn-primary" @click="alert(\'Modal Dialog with content.\')">
+                ' . $escaper->escapeHtml(__('Ok')) . '
+            </button>
+        </div>
+    ';
+
+    $contentModal = $modalViewModel->createModal()->withContent($content)->withAriaLabelledby('the-label');
+?>
+<section class="mt-20">
+    <div class="container p-4 bg-white rounded-lg shadow-md my-8" x-data="hyva.modal()">
+        <p class="text-3xl font-bold mb-2">Modal Dialog with Content</p>
+        <button  @click="<?= $escaper->escapeHtmlAttr($contentModal->getShowJs()) ?>" type="button" class="btn mt-10" aria-haspopup="dialog">
+            <?= $escaper->escapeHtml(__('Show Content Modal')) ?>
+        </button>
+        <?= $contentModal ?>
+    </div>
+</section>
+
+<!-- Template modal with rendered block -->
+<?php
+$modal = $modalViewModel->createModal()->withTemplate('Magento_Cms::modal-with-rendered-block.phtml');
+$renderTemplate = $modal->getContentRenderer();
+$renderTemplate->setData('block_id', 'contact-us-info');
+?>
+<section class="mt-20">
+    <div class="container p-4 bg-white rounded-lg shadow-md my-8">
+        <p class="text-3xl font-bold mb-2">Template modal with rendered block</p>
+        <div x-data="hyva.modal()">
+            <button @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>" type="button" class="btn mt-10" aria-haspopup="dialog">
+                <?= $escaper->escapeHtml(__('Show Template Modal with rendered block')) ?>
+            </button>
+            <?= $modal->withAriaLabel('Example template Modal with rendered block')->positionTop() ?>
+        </div>
+    </div>
+</section>
+
+
+<?php
+
+$nestedDialog = $modalViewModel->createModal()->withTemplate('Magento_Cms::modal-with-rendered-block.phtml');
+
+$outerDialog = $modalViewModel->createModal()->withContent(<<<OUTER_MODAL_CONTENT
+    <div id="outer-label">{$escaper->escapeHtml(__('Outer Model Modal'))}</div>
+
+    {$nestedDialog}<!-- NOTE 1: here the nested dialog is rendered -->
+
+    <div class="mt-20 flex justify-between gap-2">
+        <button @click="hide" type="button" class="btn">
+            {$escaper->escapeHtml(__('Cancel'))}
+        </button>
+        <button x-focus-first
+                @click="{$nestedDialog->getShowJs()}"
+                type="button"
+                aria-haspopup="dialog"
+                class="btn btn-primary">
+            {$escaper->escapeHtml(__('More Info'))}
+        </button>
+    </div>
+OUTER_MODAL_CONTENT
+)->withAriaLabelledby('outer-label');
+
+?>
+<section class="mt-20">
+    <div class="container p-4 bg-white rounded-lg shadow-md my-8">
+        <p class="text-3xl font-bold mb-2">Nested dialogs</p>
+        <div x-data="hyva.modal()">
+            <button @click="<?= $outerDialog->getShowJs() ?>" type="button" class="btn mt-10" aria-haspopup="dialog">
+                <?= $escaper->escapeHtml(__('Outer View Model')) ?>
+            </button>
+            <?= $outerDialog ?>
+        </div>
+    </div>
+</section>
+

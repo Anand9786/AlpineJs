@@ -1,0 +1,542 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+?>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+  <h2 class="font-medium mb-4 text-2xl w-full text-center">
+    Custom Form Validation
+  </h2>
+  <form
+    id="myForm"
+    x-data="{...hyva.formValidation($el), ...form()}"
+    @submit.prevent="submitform"
+    class="flex flex-wrap justify-between"
+  >
+    <div class="field field-reserved w-1/2 pr-4">
+      <label for="name"><?= $escaper->escapeHtml(__('Name:')) ?></label>
+      <input
+        type="text"
+        id="name"
+        class="form-input invalid:ring-2 invalid:ring-red-500 w-full"
+        name="name"
+        data-validate='{"required": true, "pattern": "^[a-zA-Z ]*$"}'
+        data-msg-required="Please enter name"
+        data-msg-pattern='<?= /* @noEscape  */  __("Name must only contain alphabets & space.") ?>'
+        placeholder='<?= /* @noEscape  */  __("Enter Name") ?>'
+        @input.debounce="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pl-4">
+      <label for="email"><?= $escaper->escapeHtml(__('Email:')) ?></label>
+      <input
+        type="email"
+        id="email"
+        class="form-email invalid:ring-2 invalid:ring-red-500 w-full"
+        name="email"
+        data-validate='{"required": true, "email": true}'
+        data-msg-email='<?= /* @noEscape  */  __("Invalid email") ?>'
+        data-msg-required='<?= /* @noEscape  */  __("Please enter email") ?>'
+        placeholder='<?= /* @noEscape  */  __("Enter Email") ?>'
+        @input.debounce="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pr-4">
+      <label for="password"><?= $escaper->escapeHtml(__('Password:')) ?></label>
+      <input
+        type="password"
+        id="password"
+        class="form-input invalid:ring-2 invalid:ring-red-500 w-full"
+        name="password"
+        data-validate='{"required": true, "password": true}'
+        data-msg-required="Please enter password"
+        data-msg-password="Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+        placeholder="Enter password"
+        @input.debounce="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pl-4">
+      <label for="password"
+        ><?= $escaper->escapeHtml(__('Confirm Password:')) ?></label
+      >
+      <input
+        type="password"
+        id="confirm_password"
+        class="form-input invalid:ring-2 invalid:ring-red-500 w-full"
+        name="confirm_password"
+        data-validate='{"required": true, "equalTo": "password"}'
+        data-msg-required="Please confirm the password"
+        placeholder="Enter Confirm password"
+        @input.debounce="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pr-4">
+      <label for="dob"><?= $escaper->escapeHtml(__('Birth Date:')) ?></label>
+      <input
+        type="date"
+        id="dob"
+        class="form-input invalid:ring-2 invalid:ring-red-500 w-full"
+        name="dob"
+        data-validate='{"required": true}'
+        data-msg-required="Please enter birth date"
+        @change="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pl-4">
+      <label for="mobile"><?= $escaper->escapeHtml(__('Mobile:')) ?></label>
+      <input
+        type="tel"
+        id="mobile"
+        name="mobile"
+        class="form-input invalid:ring-2 invalid:ring-red-500 w-full"
+        data-validate='{"required": true, "pattern": "[0-9]{10}", "maxlength": 10}'
+        data-msg-required='<?= /* @noEscape  */  __("Please enter mobile") ?>'
+        data-msg-pattern='<?= /* @noEscape  */  __("Mobile no. must contain 10 digit numbers.") ?>'
+        placeholder='<?= /* @noEscape  */  __("Enter Mobile") ?>'
+        @input.debounce="onChange"
+      />
+    </div>
+    <div class="field field-reserved w-1/2 pr-4">
+      <label for="highestQualification"
+        ><?= $escaper->escapeHtml(__('Highest Qualification:')) ?></label
+      >
+      <select
+        type="select"
+        id="highestQualification"
+        class="form-select invalid:ring-2 invalid:ring-red-500 w-full"
+        name="highestQualification"
+        data-validate='{"required": true}'
+        data-msg-required='<?= /* @noEscape  */  __("Please select highest qualification.") ?>'
+        @change="onChange"
+      >
+        <option value="">
+          <?= $escaper->escapeHtml(__('-- Select Highest Qualification --')) ?>
+        </option>
+        <option value="Graduate">
+          <?= $escaper->escapeHtml(__('Graduate')) ?>
+        </option>
+        <option value="HSC"><?= $escaper->escapeHtml(__('HSC')) ?></option>
+        <option value="SSC"><?= $escaper->escapeHtml(__('SSC')) ?></option>
+      </select>
+    </div>
+    <div class="field field-reserved w-1/2 pl-4">
+      <label for="gender" class="block text-gray-700 mb-1"
+        ><?= $escaper->escapeHtml(__('Gender:')) ?><br />
+        <label class="inline-flex items-center">
+          <input
+            type="radio"
+            name="gender"
+            value="Male"
+            class="form-radio"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select gender.") ?>'
+            @change="onChange"
+          />
+          <span class="ml-2"><?= $escaper->escapeHtml(__('Male')) ?></span>
+        </label>
+        <label class="inline-flex items-center ml-4">
+          <input
+            type="radio"
+            name="gender"
+            value="Female"
+            class="form-radio"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select gender.") ?>'
+            @change="onChange"
+          />
+          <span class="ml-2"><?= $escaper->escapeHtml(__('Female')) ?></span>
+        </label>
+      </label>
+    </div>
+    <div class="field field-reserved w-1/2 pl-4">
+      <span><?= $escaper->escapeHtml(__('Skills:')) ?></span>
+      <div class="flex justify-between mt-2">
+        <div class="flex item-baseline">
+          <input
+            class="mr-2"
+            type="checkbox"
+            name="skills[]"
+            id="html"
+            value="html"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select skills.") ?>'
+            @change="onChange"
+          />
+          <label for="html"><?= $escaper->escapeHtml(__('HTML')) ?></label>
+        </div>
+        <div class="flex item-baseline">
+          <input
+            class="mr-2"
+            type="checkbox"
+            name="skills[]"
+            id="css"
+            value="css"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select skills.") ?>'
+            @change="onChange"
+          />
+          <label for="css"><?= $escaper->escapeHtml(__('CSS')) ?></label>
+        </div>
+        <div class="flex item-baseline">
+          <input
+            class="mr-2"
+            type="checkbox"
+            name="skills[]"
+            id="javascript"
+            value="javascript"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select skills.") ?>'
+            @change="onChange"
+          />
+          <label for="javascript"
+            ><?= $escaper->escapeHtml(__('Javascript')) ?></label
+          >
+        </div>
+        <div class="flex item-baseline">
+          <input
+            class="mr-2"
+            type="checkbox"
+            name="skills[]"
+            id="php"
+            value="php"
+            data-validate='{"required": true}'
+            data-msg-required='<?= /* @noEscape  */  __("Please select skills.") ?>'
+            @change="onChange"
+          />
+          <label for="php"><?= $escaper->escapeHtml(__('PHP')) ?></label>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between w-full">
+      <button class="btn btn-secondary" type="submit">
+        <?= $escaper->escapeHtml(__('Submit')) ?>
+      </button>
+      <button class="btn btn-secondary" type="reset">
+        <?= $escaper->escapeHtml(__('Reset')) ?>
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function form() {
+    return {
+      submitform(event) {
+        // this.validate() is a function defined in advanced-form-validation.phtml. It's expected to return a Promise.
+        this.validate()
+          // execute if all fields pass validation
+          .then(() => {
+            window.dispatchMessages(
+              [
+                {
+                  type: "success",
+                  text: "Form submitted successfully!!!",
+                },
+              ],
+              2000
+            );
+          })
+          // execute if there are validation errors
+          .catch((invalid) => {
+            // If there are invalid fields (invalid.length > 0), it focuses on the first invalid field by calling invalid[0].focus().
+            if (invalid.length > 0) {
+              invalid[0].focus();
+              // Hyvä provides a global function window.dispatchMessages() to show messages. The type is usually one of "success", "notice", "warning" or "error".
+              window.dispatchMessages(
+                [
+                  {
+                    type: "error",
+                    text: "Form submission failed due to invalid inputs!!!",
+                  },
+                ],
+                2000
+              );
+            }
+          });
+      },
+    };
+  }
+</script>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+    <h2 class="font-medium mb-4 text-2xl w-full text-center">
+        Validation rules with a dependency on another field
+    </h2>
+
+    <form id="myForm" x-data="hyva.formValidation($el)" class="flex flex-wrap justify-between">
+        <div class="field field-reserved w-1/2 pr-4">
+            <label for="city"><?= $escaper->escapeHtml(__('Gujarat City:')) ?></label>
+            <select name="city" data-validate='{"required": true}' class="form-select invalid:ring-2 invalid:ring-red-500 w-full" @change="onChange">
+                <option value="">-- Select city --</option>
+                <option value="adi">Ahmedabad</option>
+                <option value="brd">Vadodara</option>
+                <option value="rjt">Rajkot</option>
+                <option value="srt">Surat</option>
+            </select>
+        </div>
+        <div class="field field-reserved w-1/2 pl-4">
+            <label for="vehicle"><?= $escaper->escapeHtml(__('Vehicle No.:')) ?></label>
+            <input type="text" name="vehicle" placeholder="Enter Vehicle No." data-validate='{"vehicle": {}}' class="form-input invalid:ring-2 invalid:ring-red-500 w-full" @input.debounce="onChange" />
+        </div>
+    </form>
+</div>
+
+<script>
+  // (value, options, field, context) are provided to the custom validation function to enable it to access and interact with the current value being validated, additional options or parameters, information about the field being validated, and broader context about the form and its fields.
+  hyva.formValidation.addRule(
+    "vehicle",      // vehicle is input field name
+    function (value, options, field, context) {
+      const rules = {
+        adi: [
+          "^GJ01 [A-Z]+ [0-9]{4}$", // ChatGPT
+          '<?= /* @noEscape */ __("Vehicle number for Ahmedabad must start with GJ01, e.g. GJ01 ZF 4564") ?>',
+        ],
+        brd: [
+          "^GJ06(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$",
+          '<?= /* @noEscape */ __("Vehicle number for Vadodara must start with GJ06, e.g. GJ06 ZF 4564") ?>',
+        ],
+        rjt: [
+          "^GJ03(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$",
+          '<?= /* @noEscape */ __("Vehicle number for Rajkot must start with GJ03, e.g. GJ03 ZF 4564") ?>',
+        ],
+        srt: [
+          "^GJ05(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$",
+          '<?= /* @noEscape */ __("Vehicle number for Surat must start with GJ05, e.g. GJ05 ZF 4564") ?>',
+        ],
+      };
+
+      // triggers validation on the 'city' field before validating the vehicle
+      context.validateField(context.fields["city"]);
+      // vehicle proceeds based on the selected city, If the 'city' field is valid
+      const city = context.fields["city"].element.value;
+      console.log("City:", city);
+      console.log("Value:", value);
+      if (rules[city]) {
+        // Check if rules for the selected city exist
+        console.log("Pattern:", rules[city][0]);
+        const rule = new RegExp(rules[city][0]);    
+        console.log("Test:", rule.test(value));
+        if (!rule.test(value)) {
+          return rules[city][1];
+        } else {
+          return true;
+        }
+      } else {
+        return '<?= $escaper->escapeJs(__("Invalid vehicle no..")) ?>'; // Handle invalid city selection
+      }
+    }
+  );
+</script>
+
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+    <h2 class="font-medium mb-4 text-2xl w-full text-center">
+        Validation rules with a dependency on another field 2
+    </h2>
+
+    <form id="myForm" x-data="hyva.formValidation($el)" class="flex flex-wrap justify-between">
+        <div class="field field-reserved w-1/2 pr-4">
+            <label for="country"><?= $escaper->escapeHtml(__('Country:')) ?></label>
+            <select name="country" data-validate='{"required": true}' class="form-select invalid:ring-2 invalid:ring-red-500 w-full" @change="onChange">
+                <option selected value="">Choose country</option>
+                <option value="ch">Switzerland</option>
+                <option value="fr">France</option>
+                <option value="de">Germany</option>
+                <option value="nl">The Netherlands</option>
+            </select>
+        </div>
+        <div class="field field-reserved w-1/2 pl-4">
+            <label for="zip"><?= $escaper->escapeHtml(__('Zip Code:')) ?></label>
+            <input type="text" name="zip" class="form-input invalid:ring-2 invalid:ring-red-500 w-full" placeholder="Enter ZIP code" data-validate='{"zip": {}}' @input.debounce="onChange" />
+        </div>
+    </form>
+</div>
+
+<script>
+  hyva.formValidation.addRule("zip", function (value, options, field, context) {
+    const rules = {
+      ch: [
+        "^(CH-)?\\d{4}$",
+        '<?= /* @noEscape */ __("Switzerland ZIPs must have exactly 4 digits: e.g. CH-1950 or 1950") ?>',
+      ],
+      fr: [
+        "^(F-)?\\d{5}$",
+        '<?= /* @noEscape */ __("France ZIPs must have exactly 5 digits: e.g. F-75012 or 75012") ?>',
+      ],
+      de: [
+        "^(D-)?\\d{5}$",
+        '<?= /* @noEscape */ __("Germany ZIPs must have exactly 5 digits: e.g. D-12345 or 12345") ?>',
+      ],
+      nl: [
+        "^(NL-)?\\d{4}\\s*([A-RT-Z][A-Z]|S[BCE-RT-Z])$",
+        '<?= /* @noEscape */ __("Netherland ZIPs must have exactly 4 digits, followed by 2 letters except SA, SD and SS") ?>',
+      ],
+    };
+
+    context.validateField(context.fields["country"]);
+    const country = context.fields["country"].element.value; // return a country selected value
+    console.log("Country:", country);
+    console.log("Value:", value);
+    if (country) {
+        const rule = new RegExp(rules[country][0], "");
+        console.log("Pattern:", rule); // Return a rules patern according to select option
+        console.log("Test:", rule.test(value));
+
+      if (!rule.test(value)) {
+        return rules[country][1];
+      } else {
+        return true;
+      }
+    } else {
+      return '<?= $escaper->escapeJs(__("Select country first")) ?>';
+    }
+  });
+</script>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+    <h2 class="font-medium mb-4 text-2xl w-full text-center">
+        To display additional messages besides validation failures
+    </h2>
+
+    <form x-data="hyva.formValidation($el)">
+        <div class="field field-reserved w-full">
+            <label for="address"><?= $escaper->escapeHtml(__('Address:')) ?></label>
+            <textarea
+                type="text"
+                id="address"
+                name="address"
+                class="form-textarea invalid:ring-2 invalid:ring-red-500 w-full"
+                placeholder='<?= /* @noEscape  */  __("Enter Address") ?>'
+                data-validate='{"address": 20}'
+                @input="onChange"
+            ></textarea>
+        </div>
+    </form>
+</div>
+
+<script>
+    hyva.formValidation.addRule('address', function(value, options, field, context) {
+        // Remove old message if present
+        context.removeMessages(field, 'address-msg');
+
+        // converts the options parameter into integer
+        const maxLength = parseInt(options);
+        console.log(field); // Option parameter is pass in data-validate attribute
+
+	  // calculates the difference between the maximum allowed length (maxLength) and the current length of the address field
+        const remaining = maxLength - value.trim().length;
+
+        if (value.trim() === '') {
+            // Fail validation if the address is empty
+            return 'Address is required';
+        } else if (remaining < 0) {
+            // Fail validation if the address length exceeds the maximum
+            return hyva.strf('<?= $escaper->escapeJs(__("Maximum %0 characters allowed")) ?>', maxLength);
+        } else {
+            // Add message without failing validation
+            const message = hyva.strf('<?= $escaper->escapeJs(__("%0 characters remaining")) ?>', remaining);
+            context.addMessages(field, 'address-msg', message);
+            return true;
+        }
+    });
+</script>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+    <h2 class="font-medium mb-4 text-2xl w-full text-center">
+        To add new validation rule
+    </h2>
+
+    <form x-data="hyva.formValidation($el)">
+        <div class="field field-reserved w-full">
+            <label for="mobile"><?= $escaper->escapeHtml(__('Mobile:')) ?></label>
+            <input type="tel" id="mobile" name="mobile" data-validate='{"mobile": {}}' class="form-input invalid:ring-2 invalid:ring-red-500 w-full" placeholder='<?= /* @noEscape  */  __("Enter Mobile") ?>' @input.debounce="onChange" />
+        </div>
+    </form>
+</div>
+
+<script>
+    hyva.formValidation.addRule('mobile', function(value, options, field, context) {
+        const pattern = /^[0-9]{10}$/;
+        if (value.trim() === '') {
+            // Fail validation if the mobile is empty
+            return 'Mobile is required';
+        } else if (!pattern.test(value.trim())) {
+            return hyva.strf('<?= $escaper->escapeJs(__("Mobile no. must contain 10 digit numbers.")) ?>');
+        } else {
+            return true;
+        }
+    });
+</script>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+  <h2 class="font-medium mb-4 text-2xl w-full text-center">
+    Triggering native validation messages with JavaScript
+  </h2>
+
+  <form x-data="initMyForm()" action="" method="post" @submit="validate($event)">
+      <div class="field field-reserved w-full">
+          <label for="fullName"><?= $escaper->escapeHtml(__('Full Name:')) ?></label>
+          <input type="text" id="fullName" name="fullName" x-ref="fullName" class="form-input w-full" placeholder="<?= /* @noEscape */ __("Enter Full Name") ?>" />
+      </div>
+      <button class="btn btn-default" type="submit"><?= $escaper->escapeHtml(__('Submit')) ?></button>
+  </form>
+</div>
+
+<script>
+    function initMyForm() {
+        return {
+            validate(event) {
+                // Get the input element reference
+                const fullNameField = this.$refs.fullName;
+                // show native browser error message if any constraints are violated
+                fullNameField.reportValidity();
+                
+                console.log(fullNameField);
+                
+                // prevent submitting the form if the field is invalid
+                if (!fullNameField.checkValidity()) {
+                  event.preventDefault();
+                }
+            }
+        }
+    }
+</script>
+
+<div class="container p-10 bg-white rounded-lg shadow-md my-8">
+  <h2 class="font-medium mb-4 text-2xl w-full text-center">
+    Applying constraints on user interaction
+  </h2>
+
+  <form>
+    <div class="field field-reserved w-full" x-data="{ age: '' }">
+      <label for="age"><?= $escaper->escapeHtml(__('Age:')) ?></label>
+      <input
+        name="age"
+        type="number"
+        x-model="age"
+        x-ref="age"
+        :required="$refs.age.value.length >> 0"
+        class="form-input w-full invalid:ring-2 invalid:ring-red-500"
+        placeholder="Enter age"
+      />
+    </div>
+    <div class="field field-reserved w-full" x-data="{ amount: '9' }">
+      <label for="amount"><?= $escaper->escapeHtml(__('Amount:')) ?></label>
+      <input
+        name="amount"
+        type="number"
+        x-model="amount"
+        x-ref="amount"
+        :min="10"
+        class="form-input w-full invalid:ring-2 invalid:ring-red-500"
+      />
+    </div>
+  </form>
+</div>

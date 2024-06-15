@@ -1,0 +1,288 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+?>
+
+<h2 class="font-medium mb-4 text-2xl">Modal Popup</h2>
+
+<div x-data="{showModal: false}" class="relative z-50 p-4">
+  <div class="mb-8">
+    <button class="inline-flex btn btn-primary" @click="showModal = !showModal">
+      Open Modal
+    </button>
+  </div>
+  <div
+    x-show="showModal"
+    class="fixed inset-0 z-40 w-screen h-screen bg-gray-900 bg-opacity-50 flex items-center justify-center"
+    x-cloak
+  >
+    <div class="shadow-xl rounded-md p-6 w-1/2 bg-white">
+      <div class="flex justify-between align-middle mb-4 border-b">
+        <span class="font-semibold text-xl pb-4">Modal Title</span>
+        <span class="cursor-pointer" @click="showModal = !showModal">✕</span>
+      </div>
+      <div class="text-lg"><span>Modal Content!!!!</span></div>
+      <div class="flex justify-end mt-4">
+        <button
+          class="p-2 btn btn-secondary w-20 justify-center"
+          @click="showModal = !showModal"
+        >
+          Ok
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="font-medium mb-4 text-2xl">Static Tab</h2>
+
+<div x-data="{ tab: 'tab1' }" class="mb-10 w-full">
+  <div class="border-b">
+    <button
+      :class="tab === 'tab1' ? 'bg-gray-200 font-bold' : ''"
+      class="px-4 py-2 cursor-pointer"
+      @click="tab = 'tab1'"
+    >
+      Tailwind CSS
+    </button>
+    <button
+      :class="tab === 'tab2' ? 'bg-gray-200 font-bold' : ''"
+      class="px-4 py-2 cursor-pointer"
+      @click="tab = 'tab2'"
+    >
+      AlpineJS
+    </button>
+  </div>
+  <div x-show="tab === 'tab1'" class="p-4">
+    <p>
+      Tailwind CSS is a utility-first CSS (Cascading Style Sheets) framework
+      with predefined classes that you can use to build and design web pages
+      directly in your markup.
+    </p>
+  </div>
+  <div x-show="tab === 'tab2'" class="p-4">
+    <p>
+      Alpine is a rugged, minimal tool for composing behavior directly in your
+      markup. Think of it like jQuery for the modern web. Alpine is a collection
+      of 15 attributes, 6 properties, and 2 methods.
+    </p>
+  </div>
+</div>
+
+<h2 class="font-medium mb-4 text-2xl">Dynamic Tab</h2>
+
+<div
+  class="mb-10 w-full"
+  x-data="{ tabs: [
+                { title: 'Tailwind CSS', description: 'Tailwind CSS is a utility-first CSS (Cascading Style Sheets) framework with predefined classes that you can use to build and design web pages directly in your markup.', showContent: true },
+                { title: 'AlpineJS', description: 'Alpine is a rugged, minimal tool for composing behavior directly in your markup. Think of it like jQuery for the modern web. Plop in a script tag and get going. Alpine is a collection of 15 attributes, 6 properties, and 2 methods.', showContent: false },
+            ] }"
+>
+  <div>
+    <!-- Tabs headers -->
+    <div class="flex border-b">
+      <!-- Iterate over tabs to create each tab header -->
+      <template x-for="(tab, index) in tabs">
+        <div
+          class="px-4 py-2 cursor-pointer"
+          :class="{ 'bg-gray-200 font-bold': tab.showContent }"
+          @click="tabs = tabs.map(f => ({ ...f, showContent: f.title !== tab.title ? false : !f.showContent}))"
+        >
+          <!-- Tab title -->
+          <span x-text="tab.title"></span>
+        </div>
+      </template>
+    </div>
+
+    <!-- Tabs content -->
+    <div>
+      <!-- Iterate over tabs to display content for each tab -->
+      <template x-for="(tab, index) in tabs">
+        <div x-show="tab.showContent" class="p-4">
+          <!-- Tab description -->
+          <p x-text="tab.description"></p>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>
+
+
+<h2 class="font-medium mb-4 text-2xl">Dynamic Tab Another Way</h2>
+
+<div
+  x-data="{ tab: 0,
+				    myTabs : [
+				      {
+                title: 'Tailwind CSS',
+                description: 'Tailwind CSS is a utility-first CSS (Cascading Style Sheets) framework with predefined classes that you can use to build and design web pages directly in your markup.'
+              },
+              {
+                title: 'AlpineJS',
+                description: 'Alpine is a rugged, minimal tool for composing behavior directly in your markup. Think of it like jQuery for the modern web. Plop in a script tag and get going. Alpine is a collection of 15 attributes, 6 properties, and 2 methods.'
+              },
+            ]
+		      }"
+  class="mb-10 w-full"
+>
+  <div class="flex border-b">
+    <template x-for="(myTab, index) in myTabs">
+      <span
+        class="px-4 py-2 cursor-pointer"
+        :class="{ 'bg-gray-200 font-bold': tab === index }"
+        x-text="myTab.title"
+        @click="tab=index"
+        ></span
+      >
+    </template>
+  </div>
+  <template x-for="(myTab, index) in myTabs">
+    <div
+      x-show="tab == index"
+      class="p-4"
+      x-html="myTab.description"
+    ></div>
+  </template>
+</div>
+
+
+<h2 class="font-medium mb-4 text-2xl">Static Accordion</h2>
+
+<div class="mb-10 w-full" x-data="{ openIndex: null }">
+  <div>
+    <h3
+      @click="openIndex === 0 ? openIndex = null : openIndex = 0"
+      class="flex justify-between items-center cursor-pointer border-b py-4 text-lg font-bold"
+    >
+      <span>Section 1</span>
+      <span x-show="openIndex === 0">&#8722;</span>
+      <span x-show="openIndex !== 0">&#43;</span>
+    </h3>
+    <div x-show="openIndex === 0" class="py-4 text-base">
+      <p>This is the content for Section 1.</p>
+    </div>
+  </div>
+
+  <div>
+    <h3
+      @click="openIndex === 1 ? openIndex = null : openIndex = 1"
+      class="flex justify-between items-center cursor-pointer border-b py-4 text-lg font-bold"
+    >
+      <span>Section 2</span>
+      <span x-show="openIndex === 1">&#8722;</span>
+      <span x-show="openIndex !== 1">&#43;</span>
+    </h3>
+    <div x-show="openIndex === 1" class="py-4 text-base">
+      <p>This is the content for Section 2.</p>
+    </div>
+  </div>
+
+  <div>
+    <h3
+      @click="openIndex === 2 ? openIndex = null : openIndex = 2"
+      class="flex justify-between items-center cursor-pointer border-b py-4 text-lg font-bold"
+    >
+      <span>Section 3</span>
+      <span x-show="openIndex === 2">&#8722;</span>
+      <span x-show="openIndex !== 2">&#43;</span>
+    </h3>
+    <div x-show="openIndex === 2" class="py-4 text-base">
+      <p>This is the content for Section 3.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="font-medium mb-4 text-2xl">Dynamic Accordion</h2>
+
+<div
+  class="container text-grey mx-auto px-2 py-2 mb-10"
+  x-data="{
+faqs: [
+        {
+            question: 'Accordion 1',
+            answer: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores iure quas laudantium dicta impedit, est id delectus molestiae deleniti enim nobis rem et nihil.',
+            isOpen: true,
+        },
+        {
+            question: 'Accordion 2',
+            answer: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi cumque, nulla harum aspernatur veniam ullam provident neque temporibus autem itaque odit.',
+            isOpen: false,
+        },
+        {
+            question: 'Accordion 3',
+            answer: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi cumque, nulla harum aspernatur veniam ullam provident neque temporibus autem itaque odit.',
+            isOpen: false,
+        },
+    ]
+}"
+>
+  <div class="leading-loose text-lg mt-6">
+    <template x-for="(faq, index) in faqs" :key="faq.question">
+      <div>
+        <button
+          class="w-full font-bold py-3 flex justify-between items-center mt-4"
+          :class="index !== faqs.length && 'border-b border-gray-400'"
+          @click="faqs = faqs.map(f => ({ ...f, isOpen: f.question !== faq.question ? false : !f.isOpen}))"
+        >
+          <div x-text="faq.question"></div>
+          <span x-show="!faq.isOpen">&#43;</span>
+          <span x-show="faq.isOpen">&#8722;</span>
+        </button>
+        <div
+          class="text-gray-700 text-sm mt-2"
+          x-text="faq.answer"
+          x-show="faq.isOpen"
+        ></div>
+      </div>
+    </template>
+  </div>
+</div>
+
+<h2 class="font-medium mb-4 text-2xl">Calendar</h2>
+
+<div x-data="datePicker()" class="p-4 bg-white rounded-lg shadow-md w-1/2 mb-10">
+    <label for="start" class="block text-gray-700 mb-2">Start Date:</label>
+    <!-- Input field -->
+    <input type="date"
+        id="start"
+        x-model="selectedDate"
+        class="form-control block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-200" />
+
+    <!-- Display formatted date -->
+    <p class="mt-2 text-gray-700">Selected Date: <span x-text="formattedDate"></span></p>
+</div>
+
+
+<script>
+
+    function datePicker() {
+        // Define the initial state
+        return {
+            // Define the selected date
+            selectedDate: '02-05-2023',
+
+            // Define a computed property to format the selected date
+            get formattedDate() {
+                // Parse the selected date
+                const date = new Date(this.selectedDate);
+
+                // Define an array with month names
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+                // Format the date as 'MMM DD, YYYY' (e.g., 'Jul 22, 2018')
+                const formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                
+                // Return the formatted date
+                return formattedDate;
+            },
+        };
+    }
+
+</script>
