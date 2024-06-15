@@ -1,0 +1,105 @@
+***************************************************************
+
+
+Hyva Setup
+
+1. composer config --auth http-basic.hyva-themes.repo.packagist.com token 98225013a26d1adbd77065064591f6c8a5869b5b195fc74e6fda3d4e936e
+2. composer config repositories.private-packagist composer  https://hyva-themes.repo.packagist.com/ecomextension-com/ 
+3. composer require hyva-themes/magento2-default-theme
+
+
+Tailwind CSS Customization
+
+- Copy web directory from parent theme (current my parent theme path app/design/frontend/Hyva/default/web/) to child theme (current my child theme path app/design/frontend/Brainvire/hyva-child/web/)
+- Generate hyva-themes.json
+ddev magento hyva:config:generate
+- It will generate the file app/etc/hyva-themes.json
+- Run all Magento command
+- For CSS generation follow below steps:
+Go to 
+cd app/design/frontend/Brainvire/melissa/web/tailwind
+
+npm install
+
+npm run watch
+
+- Update the parent theme and child theme files path in  app/design/frontend/Brainvire/hyva-child/web/tailwind/tailwind.config.js
+content: [
+	// this theme's phtml and layout XML files
+	'../../**/*.phtml',
+	'../../*/layout/*.xml',
+	'../../*/page_layout/override/base/*.xml',
+
+	// parent's phtml and layout XML files
+	'../../../../Hyva/**/*.phtml',
+	'../../../../Hyva/*/layout/*.xml',
+'../../../../Hyva/*/page_layout/override/base/*.xml',
+
+	// parent theme in Vendor (if this is a child-theme)
+//'../../../../../../../vendor/hyva-themes/magento2-default-theme/**/*.phtml',
+
+	// app/code phtml files (if need tailwind classes from app/code modules)
+	'../../../../../../../app/code/**/*.phtml',
+]
+tailwind-config.js customisation
+
+- You can also set browser sync by following the steps
+- Run the below command at the root
+sudo npm install -g browser-sync
+- Now run the below command with your domain at root
+browser-sync start --proxy "https://hyva.ddev.site/" --https --files 'app/**/*.phtml, app/**/*.xml, app/**/*.css, app/**/*.js'
+browser-sync start --proxy "https://magentolatest.ddev.site/" --https --files 'app/**/*.phtml, app/**/*.xml, app/**/*.css, app/**/*.js'
+
+if not changes on refresh or on browser sync
+please disable this cache
+ddev magento cache:disable block_html full_page layout
+
+
+***************************************************************
+
+
+Server Side Rendered (SSR) product sliders in xml file
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- For SSR Product Slider -->
+    <update handle="hyva_product_slider" />
+
+     <body>
+        <referenceContainer name="content">
+            <!-- Server Side Rendered (SSR) product sliders -->
+            <block name="my-slider" template="Magento_Catalog::product/slider/product-slider.phtml">
+                <arguments>
+                    <!-- Slider title -->
+                    <argument name="title" xsi:type="string" translate="true">Gear</argument>
+                    <!-- Category id ( Catalog > Category ) -->
+                    <argument name="category_ids" xsi:type="string">3</argument>
+                    <!-- maximum number of products to show in the slider -->
+                    <argument name="page_size" xsi:type="string">100</argument>
+                    <!-- Include child category product -->
+                    <argument name="include_child_category_products" xsi:type="boolean">true</argument>
+                    <!-- Only show products that have a price equal to or higher than the specified value -->
+                    <argument name="price_from" xsi:type="string">30</argument>
+                    <!-- Only show products that have a price equal to or lower than the specified value -->
+                    <argument name="price_to" xsi:type="string">40</argument>
+                    <!-- Sort the products based on the specified attribute -->
+                    <argument name="sort_attribute" xsi:type="string">created_at</argument>
+                    <!-- The direction to sort the products in: ASC, DESC -->
+                    <argument name="sort_direction" xsi:type="string">DESC</argument>
+                    <!-- hide/show product rating summary stars -->
+                    <argument name="hide_rating_summary" xsi:type="boolean">true</argument>
+                    <!-- show/hide product swatches -->
+                    <argument name="hide_details" xsi:type="boolean">true</argument>
+                    <!-- A comma separated list of product SKUs specifying the products to show in the slider -->
+                    <argument name="product_skus" xsi:type="string">24-WB03,24-WB02,24-WB05,24-WB06,24-WB01,24-MB04,24-MB03,24-MB01</argument>
+                    <!-- The CSS classes on the containing slider <section> DOM element can be specified by setting the maybe_purged_tailwind_section_classes property on the slider block -->
+                    <argument name="maybe_purged_tailwind_section_classes" xsi:type="string">py-1 bg-blue-500</argument>
+                    <!-- Each product in the slider can be specified by setting the maybe_purged_tailwind_slide_item_classes property on the slider block -->
+                    <argument name="maybe_purged_tailwind_slide_item_classes" xsi:type="string">mr-2 py-1 md:w-1/2 lg:w-1/3 xl:w-1/4</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
+
+
+***************************************************************
